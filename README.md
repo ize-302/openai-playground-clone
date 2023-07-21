@@ -1,6 +1,12 @@
 # OPEN AI PLAYGROUND CLONE (With speech to text support)
 
-This app uses NextJS + TypeScript + Tailwind + Next.js Edge API Routes
+## Tools used
+
+- NextJS
+- TypeScript
+- Tailwind
+- react-speech-recognition
+- Open AI API with Vercel AI SDK
 
 ## Why this project?
 
