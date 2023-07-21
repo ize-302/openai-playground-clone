@@ -25,7 +25,6 @@ export default function Chat() {
     isMicrophoneAvailable,
   } = useSpeechRecognition();
   const [message, setmessage] = React.useState("");
-
   const { messages, input, handleInputChange, handleSubmit, setInput } =
     useChat({
       body: {
@@ -38,13 +37,10 @@ export default function Chat() {
   };
 
   React.useEffect(() => {
-    setInput(transcript);
-
-    if (listening) {
-      toast("Listening...");
-    }
+    listening ? setInput(transcript) : setInput("");
   }, [listening]);
 
+  // on page load, check for microphone permission
   React.useEffect(() => {
     if (!isMicrophoneAvailable) {
       toast.error("Microphone not available");
@@ -56,8 +52,9 @@ export default function Chat() {
   return (
     <>
       <main className="flex min-h-screen flex-col items-center justify-between max-w-4xl w-full mx-auto border-l border-r">
-        <div className="relative flex flex-col gap-2 w-full z-[-1] overflow-y-auto">
+        <div className="relative flex flex-col gap-2 w-full">
           <p className="text-xl font-semibold p-3 border-b">Playground</p>
+
           {messages.map((m) => (
             <div key={m.id}>
               <div className="px-4 py-1 text-sm flex gap-2">
@@ -106,20 +103,37 @@ export default function Chat() {
             <div className="flex w-full rounded-md border border-gray-800 py-2 px-4 shadow-sm focus:border-black focus:ring-black">
               <input
                 className="w-full outline-none"
-                value={input || message}
+                value={message}
                 placeholder={listening ? "Listening..." : "write prompt here"}
                 onChange={(e) => {
                   handleInputChange(e);
                   setmessage(e.target.value);
                 }}
+                onKeyUp={(e) => {
+                  if (e.code === "Enter") {
+                    setmessage("");
+                    setInput("");
+                    resetTranscript();
+                  }
+                }}
               />
               <button
                 className="bg-black rounded-md w-8 h-8 grid place-content-center"
                 type="button"
-                onClick={() => {
-                  !listening
-                    ? SpeechRecognition.startListening()
-                    : SpeechRecognition.stopListening();
+                onClick={(e: any) => {
+                  if (!listening) {
+                    SpeechRecognition.startListening({
+                      continuous: true,
+                    }).then((response) => {
+                      toast("Listening...");
+                    });
+                  } else {
+                    SpeechRecognition.stopListening().then((response: any) => {
+                      toast("done");
+                      setInput(transcript);
+                      setmessage(transcript);
+                    });
+                  }
                 }}
               >
                 {listening ? (
