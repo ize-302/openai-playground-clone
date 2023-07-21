@@ -1,8 +1,10 @@
 # OPEN AI PLAYGROUND CLONE (With speech to text support)
 
+This app uses NextJS + TypeScript + Tailwind + Next.js Edge API Routes
+
 ## Why this project?
 
-giving prompt with speech is faster than typing
+giving prompt with speech is more conveninient than typing
 
 ## Getting Started
 
