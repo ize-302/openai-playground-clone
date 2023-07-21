@@ -8,7 +8,6 @@ import { Toaster, toast } from "sonner";
 import {
   IconRobot,
   IconUser,
-  IconSend,
   IconCopy,
   IconMicrophone,
   IconPlayerStopFilled,
