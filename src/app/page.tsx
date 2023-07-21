@@ -13,15 +13,10 @@ export default function Chat() {
       message,
     },
   });
-  const [savedPlayground, setsavedPlayground] = React.useState();
 
   const onSubmit = (e: any) => {
     handleSubmit(e);
   };
-
-  const lastMessage = messages[messages.length - 1];
-  const detectedTone =
-    lastMessage?.role === "assistant" ? lastMessage.content : null;
 
   return (
     <>
