@@ -54,10 +54,6 @@ export default function Chat() {
     }
   }, []);
 
-  if (!isMicrophoneAvailable) {
-    return <span>Microphone isnt available</span>;
-  }
-
   return (
     <>
       <main className="flex min-h-screen flex-col items-center justify-between max-w-4xl w-full mx-auto border-l border-r">
