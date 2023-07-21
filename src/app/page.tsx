@@ -1,22 +1,62 @@
 // ./app/page.js
 "use client";
+import "regenerator-runtime";
 
 import React from "react";
 import { useChat } from "ai/react";
 import { Toaster, toast } from "sonner";
-import { IconRobot, IconUser, IconSend, IconCopy } from "@tabler/icons-react";
+import {
+  IconRobot,
+  IconUser,
+  IconSend,
+  IconCopy,
+  IconMicrophone,
+  IconPlayerStopFilled,
+} from "@tabler/icons-react";
+import SpeechRecognition, {
+  useSpeechRecognition,
+} from "react-speech-recognition";
 
 export default function Chat() {
+  const {
+    transcript,
+    listening,
+    resetTranscript,
+    browserSupportsSpeechRecognition,
+    isMicrophoneAvailable,
+  } = useSpeechRecognition();
   const [message, setmessage] = React.useState("");
-  const { messages, input, handleInputChange, handleSubmit } = useChat({
-    body: {
-      message,
-    },
-  });
+
+  const { messages, input, handleInputChange, handleSubmit, setInput } =
+    useChat({
+      body: {
+        message,
+      },
+    });
 
   const onSubmit = (e: any) => {
     handleSubmit(e);
   };
+
+  React.useEffect(() => {
+    setInput(transcript);
+
+    if (listening) {
+      toast("Listening...");
+    }
+  }, [listening]);
+
+  React.useEffect(() => {
+    if (!isMicrophoneAvailable) {
+      toast.error("Microphone not available");
+    } else if (!browserSupportsSpeechRecognition) {
+      toast.error("Browser doesn't support speech recognition");
+    }
+  }, []);
+
+  if (!isMicrophoneAvailable) {
+    return <span>Microphone isnt available</span>;
+  }
 
   return (
     <>
@@ -68,28 +108,36 @@ export default function Chat() {
             onSubmit={onSubmit}
             className="w-full flex items-end border-t gap-2 sticky bottom-0 p-3"
           >
-            <input
-              className="w-full rounded-md border border-gray-800 py-2 px-4 shadow-sm focus:border-black focus:ring-black"
-              value={input}
-              placeholder="write prompt here"
-              onChange={(e) => {
-                handleInputChange(e);
-                setmessage(e.target.value);
-              }}
-            />
-            <button
-              type="submit"
-              disabled={!input}
-              className={`bg-green-400 text-black-700 whitespace-nowrap h-10 px-3 py-2 text-sm rounded-md ${
-                !input ? "opacity-50" : "opacity-100"
-              }`}
-            >
-              <IconSend />
-            </button>
+            <div className="flex w-full rounded-md border border-gray-800 py-2 px-4 shadow-sm focus:border-black focus:ring-black">
+              <input
+                className="w-full outline-none"
+                value={input || message}
+                placeholder={listening ? "Listening..." : "write prompt here"}
+                onChange={(e) => {
+                  handleInputChange(e);
+                  setmessage(e.target.value);
+                }}
+              />
+              <button
+                className="bg-black rounded-md w-8 h-8 grid place-content-center"
+                type="button"
+                onClick={() => {
+                  !listening
+                    ? SpeechRecognition.startListening()
+                    : SpeechRecognition.stopListening();
+                }}
+              >
+                {listening ? (
+                  <IconPlayerStopFilled size={20} className="text-red-600" />
+                ) : (
+                  <IconMicrophone size={20} className="text-white" />
+                )}
+              </button>
+            </div>
           </form>
         </div>
       </main>
-      <Toaster position="bottom-center" />
+      <Toaster position="top-center" />
     </>
   );
 }
